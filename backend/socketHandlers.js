@@ -16,7 +16,20 @@ export function setupSocketHandlers(io) {
 
                 // Send current poll if exists
                 const currentPoll = pollManager.getCurrentPoll();
-                const results = pollManager.getResults();
+
+                // Only send results if poll has ended (time expired or all answered)
+                // Otherwise, let the student answer
+                let results = null;
+                if (currentPoll) {
+                    const pollResults = pollManager.getResults();
+                    const pollEnded = pollResults.timeRemaining === 0 ||
+                        pollResults.answeredCount === pollResults.totalStudents;
+
+                    // Only send results if poll has actually ended
+                    if (pollEnded) {
+                        results = pollResults;
+                    }
+                }
 
                 callback({ success: true, currentPoll, results });
 

@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import { IntervueLogo } from '../components/IntervueLogo';
 import { Button } from '../components/Button';
 import { setName, setConnected } from '../store/slices/userSlice';
+import { setCurrentPoll, setResults, setTimeRemaining } from '../store/slices/pollSlice';
 import { socketService } from '../services/socket';
 import './StudentNameInput.css';
 
@@ -40,6 +41,18 @@ export const StudentNameInput = () => {
             if (response.success) {
                 dispatch(setName(name.trim()));
                 dispatch(setConnected(true));
+
+                // Set poll state from join response
+                if (response.currentPoll) {
+                    dispatch(setCurrentPoll(response.currentPoll));
+                    dispatch(setTimeRemaining(response.currentPoll.timeLimit));
+                }
+
+                // Only set results if provided (poll has ended)
+                if (response.results) {
+                    dispatch(setResults(response.results));
+                }
+
                 navigate('/student/poll');
             }
         } catch (err) {

@@ -66,13 +66,13 @@ A real-time interactive polling system built for teachers and students with live
    
    Create `.env` in the `backend` directory:
    ```env
-   PORT=5000
+   PORT=3000
    FRONTEND_URL=http://localhost:5173
    ```
    
    Create `.env` in the `frontend` directory:
    ```env
-   VITE_BACKEND_URL=http://localhost:5000
+   VITE_BACKEND_URL=http://localhost:3000
    ```
 
 ## 🚀 Running the Application
@@ -84,7 +84,7 @@ A real-time interactive polling system built for teachers and students with live
    cd backend
    npm run dev
    ```
-   Backend runs on: `http://localhost:5000`
+   Backend runs on: `http://localhost:3000`
 
 2. **Start Frontend (in new terminal)**
    ```bash
