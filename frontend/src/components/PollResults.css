@@ -1,0 +1,116 @@
+.poll-results {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-md);
+}
+
+.poll-results__header {
+    margin-bottom: var(--spacing-lg);
+}
+
+.poll-results__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dark-gray);
+    margin-bottom: var(--spacing-xs);
+}
+
+.poll-results__subtitle {
+    font-size: 0.875rem;
+    color: var(--medium-gray);
+}
+
+.poll-results__chart {
+    margin: var(--spacing-xl) 0;
+}
+
+.poll-results__details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-xl);
+}
+
+.poll-results__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md);
+    background: var(--off-white);
+    border-radius: var(--radius-sm);
+}
+
+.poll-results__item-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex: 1;
+}
+
+.poll-results__item-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.poll-results__item-name {
+    font-weight: 600;
+    color: var(--dark-gray);
+    word-break: break-word;
+}
+
+.poll-results__item-stats {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: 0.875rem;
+}
+
+.poll-results__item-votes {
+    font-weight: 600;
+    color: var(--dark-gray);
+}
+
+.poll-results__item-percentage {
+    color: var(--medium-gray);
+}
+
+.poll-results__students {
+    margin-top: var(--spacing-xl);
+    padding-top: var(--spacing-xl);
+    border-top: 2px solid var(--off-white);
+}
+
+.poll-results__students-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--dark-gray);
+    margin-bottom: var(--spacing-md);
+}
+
+.poll-results__students-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.poll-results__student {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--off-white);
+    border-radius: var(--radius-sm);
+}
+
+.poll-results__student-name {
+    font-weight: 600;
+    color: var(--dark-gray);
+}
+
+.poll-results__student-answer {
+    color: var(--purple-lavender);
+    font-weight: 500;
+}

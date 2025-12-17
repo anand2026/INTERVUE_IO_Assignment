@@ -1,0 +1,50 @@
+.role-card {
+    background: var(--white);
+    border: 1.5px solid #eee;
+    /* Subtle border as per clean UI */
+    border-radius: 16px;
+    /* Larger radius */
+    padding: 32px;
+    /* Genereous padding */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 380px;
+    /* Fixed width to match "box size" expectation */
+    height: 220px;
+    /* Fixed height for uniformity */
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* Center content vertically if needed, or flex-start */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.role-card:hover {
+    border-color: var(--purple-lavender);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(119, 101, 218, 0.1);
+}
+
+.role-card.selected {
+    border-color: var(--purple-lavender);
+    border-width: 2px;
+    background: white;
+    /* Often selected state is just border, or subtle tint */
+    box-shadow: 0 0 0 4px rgba(119, 101, 218, 0.1);
+    /* Glow effect */
+}
+
+.role-card__title {
+    font-size: 1.5rem;
+    /* Larger title */
+    font-weight: 800;
+    color: var(--dark-gray);
+    margin-bottom: 12px;
+}
+
+.role-card__description {
+    font-size: 0.95rem;
+    color: #666;
+    line-height: 1.6;
+}
