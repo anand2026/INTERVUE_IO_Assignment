@@ -151,12 +151,6 @@ export const StudentView = () => {
 
     return (
         <div className={`student-view fade-in ${activeTab ? 'sidebar-open' : ''}`}>
-            <div className="student-view__header">
-                <div className="brand">
-                    <IntervueLogo size={16} />
-                    <span>Intervue Poll</span>
-                </div>
-            </div>
 
             <div className="student-view__main">
                 {/* Waiting State */}

@@ -183,7 +183,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    background: white;
+    border: 2px solid #7765DA;
+    color: #7765DA;
     font-weight: 600;
     font-size: 14px;
     flex-shrink: 0;

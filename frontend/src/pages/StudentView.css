@@ -173,17 +173,21 @@
 }
 
 .opt-number {
-    background: #7765DA;
+    background: #8D8D8D;
     color: white;
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.7rem;
+    font-size: 12px;
     font-weight: 600;
     margin-right: 12px;
+}
+
+.poll-option.selected .opt-number {
+    background: linear-gradient(243.94deg, #8F64E1 -50.82%, #4E377B 216.33%);
 }
 
 .opt-text {

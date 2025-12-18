@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Zap, Eye } from 'lucide-react';
+import { Zap } from 'lucide-react';
+import EyeIcon from '../assets/Eye.svg';
 import { Button } from '../components/Button';
 import { Timer } from '../components/Timer';
 import { PollResults } from '../components/PollResults';
@@ -142,23 +143,16 @@ export const TeacherDashboard = () => {
     return (
         <div className={`teacher-dashboard fade-in ${activeTab ? 'sidebar-open' : ''}`}>
             <div className="teacher-dashboard__main">
-                {/* Header */}
-                <div className="teacher-dashboard__header">
-                    <div className="brand">
-                        <IntervueLogo size={16} />
-                        <span>Intervue Poll</span>
-                    </div>
-                    <div className="header-actions">
-                        <button
-                            className="view-history-btn"
-                            onClick={() => setShowHistory(true)}
-                        >
-                            <Eye size={18} />
-                            View Poll history
-                        </button>
-                    </div>
-                </div>
-
+                {/* View Poll history button - hide when viewing poll history */}
+                {!showHistory && (
+                    <button
+                        className="view-history-btn"
+                        onClick={() => setShowHistory(true)}
+                    >
+                        <img src={EyeIcon} alt="" width={24} height={24} />
+                        View Poll history
+                    </button>
+                )}
                 <div className="teacher-dashboard__content-wrapper">
                     {/* Poll History View - Full Page */}
                     {showHistory ? (
@@ -189,17 +183,17 @@ export const TeacherDashboard = () => {
                                                             const percentage = totalVotes > 0 ? ((voteCount / totalVotes) * 100).toFixed(0) : 0;
                                                             return (
                                                                 <div key={optIndex} className="history-item__option">
-                                                                    <div className="history-item__option-info">
-                                                                        <span className="history-item__option-circle">{optIndex + 1}</span>
-                                                                        <span className="history-item__option-text">{option}</span>
+                                                                    <div
+                                                                        className="history-item__option-bar-fill"
+                                                                        style={{ width: `${percentage}%` }}
+                                                                    />
+                                                                    <div className="history-item__option-content">
+                                                                        <div className="history-item__option-left">
+                                                                            <span className="history-item__option-circle">{optIndex + 1}</span>
+                                                                            <span className="history-item__option-text">{option}</span>
+                                                                        </div>
+                                                                        <span className="history-item__option-percentage">{percentage}%</span>
                                                                     </div>
-                                                                    <div className="history-item__option-bar-container">
-                                                                        <div
-                                                                            className="history-item__option-bar-fill"
-                                                                            style={{ width: `${percentage}%` }}
-                                                                        />
-                                                                    </div>
-                                                                    <span className="history-item__option-percentage">{percentage}%</span>
                                                                 </div>
                                                             );
                                                         })}

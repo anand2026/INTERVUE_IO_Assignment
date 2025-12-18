@@ -37,7 +37,7 @@ export const PollResults = ({ results, isTeacher = false }) => {
                         </div>
                         <div className="poll-results__bar-content">
                             <div className="poll-results__bar-left">
-                                <span className="poll-results__option-circle" style={{ background: CIRCLE_COLOR }}>
+                                <span className="poll-results__option-circle">
                                     {index + 1}
                                 </span>
                                 <span className="poll-results__option-text">{item.name}</span>

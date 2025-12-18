@@ -16,7 +16,7 @@
     height: 60px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     padding: 0 40px;
     background: white;
     border-bottom: 1px solid #eee;
@@ -52,29 +52,36 @@
 }
 
 .view-history-btn {
-    background: linear-gradient(135deg, #7765DA, #5B9BFA);
+    position: fixed;
+    top: 20px;
+    right: 40px;
+    width: 267px;
+    height: 53px;
+    background: #8F64E1;
     color: white;
     border: none;
-    padding: 10px 20px;
-    border-radius: 25px;
-    font-size: 14px;
+    border-radius: 34px;
+    font-family: 'Sora', sans-serif;
+    font-size: 18px;
     font-weight: 600;
     cursor: pointer;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 2px 8px rgba(119, 101, 218, 0.3);
+    box-shadow: 0 2px 8px rgba(143, 100, 225, 0.3);
+    z-index: 100;
 }
 
 .view-history-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(119, 101, 218, 0.4);
+    box-shadow: 0 4px 12px rgba(143, 100, 225, 0.4);
 }
 
 .teacher-dashboard__content-wrapper {
     max-width: 800px;
-    margin: 40px auto;
+    margin: 100px auto 40px;
     padding: 0 20px;
 }
 
@@ -504,22 +511,53 @@
 .history-item__option {
     display: flex;
     align-items: center;
+    width: 100%;
+    height: 55px;
+    border: 1px solid #E5E5E5;
+    border-radius: 6px;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+    background: #F5F5F5;
+}
+
+.history-item__option-bar-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: #6766D5;
+    border-radius: 6px 0 0 6px;
+    transition: width 0.3s ease;
+}
+
+.history-item__option-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 1;
+    box-sizing: border-box;
+}
+
+.history-item__option-left {
+    display: flex;
+    align-items: center;
     gap: 12px;
 }
 
-.history-item__option-info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-width: 120px;
-}
-
 .history-item__option-circle {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
-    background: #7765DA;
-    color: white;
+    background: white;
+    border: 2px solid #7765DA;
+    color: #7765DA;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -533,25 +571,8 @@
     color: var(--dark-gray);
 }
 
-.history-item__option-bar-container {
-    flex: 1;
-    height: 40px;
-    background: #f0f0f0;
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-.history-item__option-bar-fill {
-    height: 100%;
-    background: #7765DA;
-    border-radius: 4px;
-    transition: width 0.3s ease;
-}
-
 .history-item__option-percentage {
     font-size: 14px;
     font-weight: 600;
     color: var(--dark-gray);
-    min-width: 50px;
-    text-align: right;
 }
