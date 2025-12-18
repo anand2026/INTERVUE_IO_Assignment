@@ -12,7 +12,8 @@ import {
     setResults,
     setHasAnswered,
     setTimeRemaining,
-    setStudents
+    setStudents,
+    clearPoll
 } from '../store/slices/pollSlice';
 import './StudentView.css';
 
@@ -52,8 +53,64 @@ export const StudentView = () => {
             setShowResults(true);
         });
         socketService.on('student:removed', () => {
-            alert('You have been removed');
-            navigate('/');
+            console.log('🔴 KICKOUT EVENT RECEIVED');
+
+            // Disconnect socket immediately
+            socketService.disconnect();
+
+            // Use requestAnimationFrame to ensure DOM is ready
+            requestAnimationFrame(() => {
+                console.log('🔴 Creating modal...');
+
+                // Remove any existing modal
+                const existing = document.getElementById('kickout-overlay');
+                if (existing) existing.remove();
+
+                // Show a styled notification instead of alert
+                const overlay = document.createElement('div');
+                overlay.id = 'kickout-overlay';
+                overlay.style.cssText = 'position:fixed !important;top:0 !important;left:0 !important;right:0 !important;bottom:0 !important;background:rgba(0,0,0,0.95) !important;display:flex !important;align-items:center !important;justify-content:center !important;z-index:2147483647 !important;';
+
+                const modal = document.createElement('div');
+                modal.style.cssText = 'background:white !important;padding:50px 40px !important;border-radius:20px !important;text-align:center !important;max-width:450px !important;box-shadow:0 20px 60px rgba(0,0,0,0.5) !important;';
+                modal.innerHTML = `
+                    <div style="width:64px;height:64px;background:#ef4444;border-radius:50%;margin:0 auto 24px;display:flex;align-items:center;justify-content:center;">
+                        <svg width="32" height="32" fill="white" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 11c-.55 0-1-.45-1-1V8c0-.55.45-1 1-1s1 .45 1 1v4c0 .55-.45 1-1 1zm1 4h-2v-2h2v2z"/></svg>
+                    </div>
+                    <h2 style="margin:0 0 16px;font-size:28px;font-weight:700;color:#1f2937;">You've been Kicked Out!</h2>
+                    <p style="margin:0 0 8px;color:#6b7280;font-size:16px;line-height:1.6;">The teacher has removed you from the poll system.</p>
+                    <p style="margin:0;color:#ef4444;font-size:18px;font-weight:600;">Redirecting in <span id="countdown" style="font-size:28px;font-weight:800;color:#ef4444;">5</span> seconds...</p>
+                `;
+
+                overlay.appendChild(modal);
+                document.body.appendChild(overlay);
+                document.body.style.overflow = 'hidden';
+
+                console.log('🔴 Modal added to body');
+
+                // Countdown
+                let secondsLeft = 5;
+                const countdownEl = document.getElementById('countdown');
+
+                const countdownInterval = setInterval(() => {
+                    secondsLeft--;
+                    console.log(`🔴 Countdown: ${secondsLeft}`);
+                    if (countdownEl) {
+                        countdownEl.textContent = secondsLeft;
+                        if (secondsLeft <= 2) {
+                            countdownEl.style.fontSize = '32px';
+                            countdownEl.style.color = '#dc2626';
+                        }
+                    }
+                    if (secondsLeft <= 0) clearInterval(countdownInterval);
+                }, 1000);
+
+                // Redirect after 5 seconds using window.location (not React navigate)
+                setTimeout(() => {
+                    console.log('🔴 Redirecting to home');
+                    window.location.href = '/';
+                }, 5100);
+            });
         });
 
         // Listen for student list updates so sidebar is accurate

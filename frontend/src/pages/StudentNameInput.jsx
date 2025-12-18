@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { IntervueLogo } from '../components/IntervueLogo';
 import { Button } from '../components/Button';
-import { setName, setConnected } from '../store/slices/userSlice';
+import { setName, setConnected, setRole } from '../store/slices/userSlice';
 import { setCurrentPoll, setResults, setTimeRemaining } from '../store/slices/pollSlice';
 import { socketService } from '../services/socket';
 import './StudentNameInput.css';
@@ -40,6 +40,7 @@ export const StudentNameInput = () => {
 
             if (response.success) {
                 dispatch(setName(name.trim()));
+                dispatch(setRole('student'));  // Set role for chat functionality
                 dispatch(setConnected(true));
 
                 // Set poll state from join response

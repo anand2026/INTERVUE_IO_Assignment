@@ -195,7 +195,9 @@ export function setupSocketHandlers(io) {
         // Get chat history
         socket.on('chat:getHistory', (callback) => {
             const messages = chatManager.getMessages();
-            callback({ success: true, messages });
+            if (callback && typeof callback === 'function') {
+                callback({ success: true, messages });
+            }
         });
 
         // Disconnect

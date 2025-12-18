@@ -86,19 +86,24 @@ export const Sidebar = ({ activeTab, onClose, isTeacher = false }) => {
                                 No messages yet. Start the conversation!
                             </div>
                         ) : (
-                            messages.map((msg) => (
-                                <div
-                                    key={msg.id}
-                                    className={`chat-message ${msg.sender === name ? 'chat-message--own' : ''}`}
-                                >
-                                    <div className="chat-message__bubble">
-                                        {msg.sender !== name && (
-                                            <span className="chat-message__sender">{msg.sender}</span>
-                                        )}
-                                        <div className="chat-message__text">{msg.message}</div>
+                            messages.map((msg) => {
+                                const isOwnMessage = msg.sender === name;
+                                return (
+                                    <div
+                                        key={msg.id}
+                                        className={`chat-message ${isOwnMessage ? 'chat-message--own' : ''}`}
+                                    >
+                                        <div className="chat-message__bubble">
+                                            {!isOwnMessage && (
+                                                <span className="chat-message__sender">
+                                                    {msg.role === 'teacher' ? '👨‍🏫 ' : ''}{msg.sender}
+                                                </span>
+                                            )}
+                                            <div className="chat-message__text">{msg.message}</div>
+                                        </div>
                                     </div>
-                                </div>
-                            ))
+                                );
+                            })
                         )}
                         <div ref={messagesEndRef} />
                     </div>
