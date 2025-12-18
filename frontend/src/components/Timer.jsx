@@ -9,7 +9,9 @@ export const Timer = ({ timeRemaining }) => {
 
     return (
         <div className={`timer ${isLowTime ? 'timer--low' : ''}`}>
-            <div className="timer__icon">⏱️</div>
+            <div className="timer__icon">
+                <img src="/src/assets/Timer.svg" alt="Timer" />
+            </div>
             <div className="timer__value">
                 {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
             </div>
