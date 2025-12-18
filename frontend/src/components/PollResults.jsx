@@ -1,21 +1,24 @@
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import './PollResults.css';
 
 const COLORS = ['#7765DA', '#5767D0', '#4F0DCE', '#9333EA'];
 
-export const PollResults = ({ results }) => {
+export const PollResults = ({ results, isTeacher = false }) => {
     if (!results) return null;
 
-    const chartData = results.options.map((option, index) => ({
-        name: option,
-        votes: results.votes[index],
-        percentage: results.votes[index] > 0
-            ? ((results.votes[index] / results.answeredCount) * 100).toFixed(1)
-            : 0
-    }));
+    const chartData = results.options.map((option, index) => {
+        const voteCount = results.votes ? results.votes[index] : 0;
+        // Calculate percentage based on total votes to prevent incorrect percentages
+        const totalVotes = results.votes ? results.votes.reduce((a, b) => a + b, 0) : 0;
 
-    const maxVotes = Math.max(...results.votes);
+        return {
+            name: option,
+            votes: voteCount,
+            percentage: totalVotes > 0
+                ? ((voteCount / totalVotes) * 100).toFixed(1)
+                : 0
+        };
+    });
 
     return (
         <div className="poll-results">
@@ -26,53 +29,30 @@ export const PollResults = ({ results }) => {
                 </p>
             </div>
 
-            <div className="poll-results__chart">
-                <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={chartData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                        <XAxis
-                            dataKey="name"
-                            tick={{ fill: '#6E6E6E', fontSize: 12 }}
-                            tickFormatter={(value) => value.length > 20 ? value.substring(0, 20) + '...' : value}
-                        />
-                        <YAxis tick={{ fill: '#6E6E6E', fontSize: 12 }} />
-                        <Tooltip
-                            contentStyle={{
-                                background: 'white',
-                                border: '1px solid #E5E7EB',
-                                borderRadius: '8px',
-                                padding: '12px'
-                            }}
-                            formatter={(value) => [`${value} votes`, '']}
-                        />
-                        <Bar dataKey="votes" radius={[8, 8, 0, 0]}>
-                            {chartData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                            ))}
-                        </Bar>
-                    </BarChart>
-                </ResponsiveContainer>
-            </div>
-
-            <div className="poll-results__details">
+            <div className="poll-results__horizontal-bars">
                 {chartData.map((item, index) => (
-                    <div key={index} className="poll-results__item">
-                        <div className="poll-results__item-header">
-                            <span
-                                className="poll-results__item-color"
-                                style={{ background: COLORS[index % COLORS.length] }}
+                    <div key={index} className="poll-results__bar-item">
+                        <div className="poll-results__bar-label">
+                            <span className="poll-results__option-circle" style={{ background: COLORS[index % COLORS.length] }}>
+                                {index + 1}
+                            </span>
+                            <span className="poll-results__option-text">{item.name}</span>
+                        </div>
+                        <div className="poll-results__bar-container">
+                            <div
+                                className="poll-results__bar-fill"
+                                style={{
+                                    width: `${item.percentage}%`,
+                                    background: COLORS[index % COLORS.length]
+                                }}
                             />
-                            <span className="poll-results__item-name">{item.name}</span>
                         </div>
-                        <div className="poll-results__item-stats">
-                            <span className="poll-results__item-votes">{item.votes} votes</span>
-                            <span className="poll-results__item-percentage">({item.percentage}%)</span>
-                        </div>
+                        <span className="poll-results__percentage">{item.percentage}%</span>
                     </div>
                 ))}
             </div>
 
-            {results.studentAnswers && results.studentAnswers.length > 0 && (
+            {isTeacher && results.studentAnswers && results.studentAnswers.length > 0 && (
                 <div className="poll-results__students">
                     <h4 className="poll-results__students-title">Student Responses</h4>
                     <div className="poll-results__students-list">

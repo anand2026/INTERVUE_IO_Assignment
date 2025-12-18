@@ -5,6 +5,7 @@ import { Timer } from '../components/Timer';
 import { PollResults } from '../components/PollResults';
 import { Button } from '../components/Button';
 import { Sidebar } from '../components/Sidebar';
+import { ChatButton } from '../components/ChatButton';
 import { socketService } from '../services/socket';
 import { IntervueLogo } from '../components/IntervueLogo';
 import {
@@ -26,6 +27,7 @@ export const StudentView = () => {
     const [showResults, setShowResults] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [activeTab, setActiveTab] = useState(null);
+    const [isChatOpen, setIsChatOpen] = useState(false);
 
     useEffect(() => {
         if (!name) {
@@ -69,17 +71,22 @@ export const StudentView = () => {
                 // Show a styled notification instead of alert
                 const overlay = document.createElement('div');
                 overlay.id = 'kickout-overlay';
-                overlay.style.cssText = 'position:fixed !important;top:0 !important;left:0 !important;right:0 !important;bottom:0 !important;background:rgba(0,0,0,0.95) !important;display:flex !important;align-items:center !important;justify-content:center !important;z-index:2147483647 !important;';
+                overlay.style.cssText = 'position:fixed !important;top:0 !important;left:0 !important;right:0 !important;bottom:0 !important;background:white !important;display:flex !important;align-items:center !important;justify-content:center !important;z-index:2147483647 !important;';
 
                 const modal = document.createElement('div');
-                modal.style.cssText = 'background:white !important;padding:50px 40px !important;border-radius:20px !important;text-align:center !important;max-width:450px !important;box-shadow:0 20px 60px rgba(0,0,0,0.5) !important;';
+                modal.style.cssText = 'background:white !important;padding:60px 40px !important;border-radius:0 !important;text-align:center !important;max-width:100% !important;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;';
                 modal.innerHTML = `
-                    <div style="width:64px;height:64px;background:#ef4444;border-radius:50%;margin:0 auto 24px;display:flex;align-items:center;justify-content:center;">
-                        <svg width="32" height="32" fill="white" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 11c-.55 0-1-.45-1-1V8c0-.55.45-1 1-1s1 .45 1 1v4c0 .55-.45 1-1 1zm1 4h-2v-2h2v2z"/></svg>
+                    <div style="max-width: 600px;">
+                        <div style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #7765DA, #5B9BFA); color: white; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 40px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                            </svg>
+                            Intervue Poll
+                        </div>
+                        
+                        <h2 style="margin:0 0 16px;font-size:32px;font-weight:700;color:#1a1a1a;letter-spacing:-0.5px;">You've been Kicked out !</h2>
+                        <p style="margin:0;color:#6b7280;font-size:16px;line-height:1.6;">Looks like the teacher had removed you from the poll system .Please<br/>Try again sometime.</p>
                     </div>
-                    <h2 style="margin:0 0 16px;font-size:28px;font-weight:700;color:#1f2937;">You've been Kicked Out!</h2>
-                    <p style="margin:0 0 8px;color:#6b7280;font-size:16px;line-height:1.6;">The teacher has removed you from the poll system.</p>
-                    <p style="margin:0;color:#ef4444;font-size:18px;font-weight:600;">Redirecting in <span id="countdown" style="font-size:28px;font-weight:800;color:#ef4444;">5</span> seconds...</p>
                 `;
 
                 overlay.appendChild(modal);
@@ -88,28 +95,11 @@ export const StudentView = () => {
 
                 console.log('🔴 Modal added to body');
 
-                // Countdown
-                let secondsLeft = 5;
-                const countdownEl = document.getElementById('countdown');
-
-                const countdownInterval = setInterval(() => {
-                    secondsLeft--;
-                    console.log(`🔴 Countdown: ${secondsLeft}`);
-                    if (countdownEl) {
-                        countdownEl.textContent = secondsLeft;
-                        if (secondsLeft <= 2) {
-                            countdownEl.style.fontSize = '32px';
-                            countdownEl.style.color = '#dc2626';
-                        }
-                    }
-                    if (secondsLeft <= 0) clearInterval(countdownInterval);
-                }, 1000);
-
-                // Redirect after 5 seconds using window.location (not React navigate)
+                // Redirect after 4 seconds using window.location
                 setTimeout(() => {
                     console.log('🔴 Redirecting to home');
                     window.location.href = '/';
-                }, 5100);
+                }, 4000);
             });
         });
 
@@ -248,18 +238,27 @@ export const StudentView = () => {
                         </div>
                         <h2 className="poll-question">{currentPoll ? currentPoll.question : "Poll Ended"}</h2>
 
-                        <PollResults results={results} />
+                        <PollResults results={results} isTeacher={false} />
 
                         <p className="wait-footer">Wait for the teacher to ask a new question..</p>
                     </div>
                 )}
             </div>
 
-            <Sidebar
-                activeTab={activeTab}
-                onClose={() => setActiveTab(null)}
-                isTeacher={false}
-            />
+            {/* Chat Button - Bottom Right */}
+            <ChatButton onClick={() => {
+                setIsChatOpen(!isChatOpen);
+                if (!isChatOpen) setActiveTab('chat');
+            }} />
+
+            {/* Sidebar Modal */}
+            {isChatOpen && (
+                <Sidebar
+                    activeTab={activeTab || 'chat'}
+                    onClose={() => setIsChatOpen(false)}
+                    isTeacher={false}
+                />
+            )}
         </div>
     );
 };

@@ -5,12 +5,13 @@ import { socketService } from '../services/socket';
 import { addMessage, setMessages } from '../store/slices/chatSlice';
 import './Sidebar.css';
 
-export const Sidebar = ({ activeTab, onClose, isTeacher = false }) => {
+export const Sidebar = ({ activeTab: initialTab, onClose, isTeacher = false }) => {
     const dispatch = useDispatch();
     const { messages } = useSelector((state) => state.chat);
     const { name } = useSelector((state) => state.user);
     const { students } = useSelector((state) => state.poll);
     const [inputMessage, setInputMessage] = React.useState('');
+    const [activeTab, setActiveTab] = React.useState(initialTab || 'chat');
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
@@ -18,7 +19,7 @@ export const Sidebar = ({ activeTab, onClose, isTeacher = false }) => {
         if (activeTab === 'chat') {
             socketService.emit('chat:getHistory')
                 .then((response) => {
-                    if (response.messages) {
+                    if (response && response.messages) {
                         dispatch(setMessages(response.messages));
                     }
                 })
@@ -54,31 +55,41 @@ export const Sidebar = ({ activeTab, onClose, isTeacher = false }) => {
             .catch(console.error);
     };
 
-    const handleKickStudent = async (studentName) => {
-        if (!isTeacher) return;
-        if (!window.confirm(`Are you sure you want to kick ${studentName}?`)) return;
+    const handleRemoveStudent = (studentName) => {
+        if (!window.confirm(`Remove ${studentName}?`)) return;
 
-        try {
-            await socketService.emit('teacher:removeStudent', { name: studentName });
-        } catch (error) {
-            console.error('Failed to kick student:', error);
-        }
+        socketService.emit('student:remove', { studentName })
+            .then((response) => {
+                if (!response.success) {
+                    alert('Failed to remove student');
+                }
+            })
+            .catch(console.error);
     };
 
-    if (!activeTab) return null;
-
     return (
-        <div className={`sidebar ${activeTab ? 'open' : ''}`}>
+        <div className="sidebar">
             <div className="sidebar__header">
-                <h3 className="sidebar__title">
-                    {activeTab === 'chat' ? 'Chat' : 'Participants'}
-                </h3>
+                <div className="sidebar__tabs">
+                    <button
+                        className={`sidebar__tab ${activeTab === 'chat' ? 'sidebar__tab--active' : ''}`}
+                        onClick={() => setActiveTab('chat')}
+                    >
+                        Chat
+                    </button>
+                    <button
+                        className={`sidebar__tab ${activeTab === 'participants' ? 'sidebar__tab--active' : ''}`}
+                        onClick={() => setActiveTab('participants')}
+                    >
+                        Participants
+                    </button>
+                </div>
                 <button className="sidebar__close" onClick={onClose}>
                     <X size={20} />
                 </button>
             </div>
 
-            {activeTab === 'chat' && (
+            {activeTab === 'chat' ? (
                 <div className="sidebar__content sidebar__content--chat">
                     <div className="sidebar__messages">
                         {messages.length === 0 ? (
@@ -93,12 +104,12 @@ export const Sidebar = ({ activeTab, onClose, isTeacher = false }) => {
                                         key={msg.id}
                                         className={`chat-message ${isOwnMessage ? 'chat-message--own' : ''}`}
                                     >
+                                        {!isOwnMessage && (
+                                            <span className="chat-message__sender">
+                                                {msg.sender}
+                                            </span>
+                                        )}
                                         <div className="chat-message__bubble">
-                                            {!isOwnMessage && (
-                                                <span className="chat-message__sender">
-                                                    {msg.role === 'teacher' ? '👨‍🏫 ' : ''}{msg.sender}
-                                                </span>
-                                            )}
                                             <div className="chat-message__text">{msg.message}</div>
                                         </div>
                                     </div>
@@ -108,7 +119,7 @@ export const Sidebar = ({ activeTab, onClose, isTeacher = false }) => {
                         <div ref={messagesEndRef} />
                     </div>
 
-                    <form className="sidebar__input-area" onSubmit={handleSendMessage}>
+                    <form className="sidebar__input-form" onSubmit={handleSendMessage}>
                         <input
                             type="text"
                             value={inputMessage}
@@ -116,36 +127,27 @@ export const Sidebar = ({ activeTab, onClose, isTeacher = false }) => {
                             placeholder="Type a message..."
                             className="sidebar__input"
                         />
-                        <button
-                            type="submit"
-                            className="sidebar__send-btn"
-                            disabled={!inputMessage.trim()}
-                        >
+                        <button type="submit" className="sidebar__send-btn">
                             <Send size={18} />
                         </button>
                     </form>
                 </div>
-            )}
-
-            {activeTab === 'participants' && (
-                <div className="sidebar__content">
-                    <div className="participants-list">
-                        <div className="participants-header">
-                            <span>Name</span>
-                            {isTeacher && <span>Action</span>}
-                        </div>
+            ) : (
+                <div className="sidebar__content sidebar__content--participants">
+                    <div className="sidebar__participants">
                         {students.length === 0 ? (
-                            <div className="sidebar__empty">No students joined yet</div>
+                            <div className="sidebar__empty">
+                                No students have joined yet.
+                            </div>
                         ) : (
-                            students.map((student) => (
-                                <div key={student.name} className="participant-row">
-                                    <div className="participant-info">
-                                        <span className="participant-name">{student.name}</span>
-                                    </div>
+                            students.map((student, index) => (
+                                <div key={index} className="sidebar__participant">
+                                    <span className="sidebar__participant-name">{student.name}</span>
                                     {isTeacher && (
                                         <button
-                                            className="kick-btn"
-                                            onClick={() => handleKickStudent(student.name)}
+                                            className="sidebar__remove-btn"
+                                            onClick={() => handleRemoveStudent(student.name)}
+                                            title="Remove student"
                                         >
                                             Kick out
                                         </button>

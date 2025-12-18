@@ -6,6 +6,7 @@ import { Button } from '../components/Button';
 import { Timer } from '../components/Timer';
 import { PollResults } from '../components/PollResults';
 import { Sidebar } from '../components/Sidebar';
+import { ChatButton } from '../components/ChatButton';
 import { IntervueLogo } from '../components/IntervueLogo';
 import { socketService } from '../services/socket';
 import {
@@ -26,6 +27,7 @@ export const TeacherDashboard = () => {
     const { currentPoll, results, timeRemaining } = useSelector((state) => state.poll);
 
     const [activeTab, setActiveTab] = useState(null); // 'chat' or 'participants'
+    const [isChatOpen, setIsChatOpen] = useState(false);
 
     // Poll Creation State
     const [question, setQuestion] = useState('');
@@ -254,7 +256,7 @@ export const TeacherDashboard = () => {
 
                             {/* Always show results, even if empty */}
                             {results ? (
-                                <PollResults results={results} />
+                                <PollResults results={results} isTeacher={true} />
                             ) : (
                                 /* Show initial empty results structure */
                                 <PollResults results={{
@@ -282,11 +284,20 @@ export const TeacherDashboard = () => {
                 </div>
             </div>
 
-            <Sidebar
-                activeTab={activeTab}
-                onClose={() => setActiveTab(null)}
-                isTeacher={true}
-            />
+            {/* Chat Button - Bottom Right */}
+            <ChatButton onClick={() => {
+                setIsChatOpen(!isChatOpen);
+                if (!isChatOpen) setActiveTab('chat'); // Default to chat tab when opening
+            }} />
+
+            {/* Sidebar Modal */}
+            {isChatOpen && (
+                <Sidebar
+                    activeTab={activeTab || 'chat'}
+                    onClose={() => setIsChatOpen(false)}
+                    isTeacher={true}
+                />
+            )}
         </div>
     );
 };

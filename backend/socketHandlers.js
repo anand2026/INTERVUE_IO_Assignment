@@ -135,9 +135,9 @@ export function setupSocketHandlers(io) {
         });
 
         // Teacher removes student
-        socket.on('teacher:removeStudent', ({ name }, callback) => {
+        socket.on('student:remove', ({ studentName }, callback) => {
             try {
-                const { removedSocketId, students } = pollManager.removeStudentByName(name);
+                const { removedSocketId, students } = pollManager.removeStudentByName(studentName);
 
                 callback({ success: true, students });
 
@@ -155,7 +155,7 @@ export function setupSocketHandlers(io) {
                     io.emit('poll:resultsUpdated', results);
                 }
 
-                console.log(`🚫 Student removed: ${name}`);
+                console.log(`🚫 Student removed: ${studentName}`);
             } catch (error) {
                 callback({ success: false, error: error.message });
             }
