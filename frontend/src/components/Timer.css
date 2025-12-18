@@ -1,19 +1,15 @@
 .timer {
     display: flex;
     align-items: center;
-    gap: 8px;
-    background: #f3f4f6;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    color: #1f2937;
-    transition: all 0.3s ease;
+    gap: 6px;
+    font-family: 'Sora', sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    color: #E53935;
 }
 
 .timer--low {
-    background: #fee2e2;
-    color: #ef4444;
+    color: #E53935;
     animation: pulse 1s infinite;
 }
 
@@ -21,16 +17,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    color: #E53935;
 }
 
 .timer__icon img {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
 }
 
 .timer__value {
     font-variant-numeric: tabular-nums;
     font-size: 16px;
+    color: #E53935;
 }
 
 @keyframes pulse {

@@ -4,8 +4,7 @@
     align-items: center;
     justify-content: center;
     padding: var(--spacing-lg);
-    background-color: #f7f7f7;
-    /* Matching light grey background from screenshot */
+    background: white;
     color: var(--dark-gray);
 }
 
@@ -22,44 +21,51 @@
 .role-selection__badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    background: linear-gradient(135deg, var(--purple-lavender), var(--soft-blue));
-    color: var(--white);
-    padding: 8px 16px;
-    border-radius: var(--radius-full);
+    justify-content: center;
+    gap: 7px;
+    width: 134px;
+    height: 31px;
+    background: linear-gradient(90deg, #7565D9 0%, #4D0ACD 100%);
+    color: white;
+    padding: 0 9px;
+    border-radius: 24px;
+    font-family: 'Sora', sans-serif;
     font-weight: 600;
-    font-size: 0.75rem;
+    font-size: 14px;
+    line-height: 100%;
+    letter-spacing: 0%;
     margin-bottom: var(--spacing-xl);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
 
 .role-selection__title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--white);
-    margin-bottom: var(--spacing-sm);
-    line-height: 1.2;
+    font-family: 'Sora', sans-serif;
+    font-weight: 400;
+    font-size: 40px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    text-align: center;
+    color: var(--dark-gray);
+    margin-bottom: 26px;
+    max-width: 737px;
 }
 
 .highlight {
-    /* White text for 'Live Polling System' based on screenshot 661/2? 
-     Actually, looking at 661, "Live Polling System" is Bold Black on White BG.
-     Ah, the user's uploaded images show a WHITE PAGE background in the screenshots (inside the mockup frame).
-     The mockup frame has a dark background. The App itself is WHITE.
-     Let me correct the background color back to white or default.
-  */
-    font-weight: 800;
+    font-family: 'Sora', sans-serif;
+    font-weight: 600;
 }
 
 .role-selection__subtitle {
-    font-size: 1rem;
+    font-family: 'Sora', sans-serif;
+    font-weight: 400;
+    font-size: 19px;
+    line-height: 140%;
+    letter-spacing: 0%;
+    text-align: center;
     color: var(--medium-gray);
     margin-bottom: var(--spacing-2xl);
-    max-width: 500px;
+    max-width: 680px;
     margin-left: auto;
     margin-right: auto;
-    line-height: 1.5;
 }
 
 .role-selection__cards {
@@ -78,7 +84,7 @@
 
 /* Override background back to normal if I set it to dark above mistakenly */
 .role-selection {
-    background-color: var(--off-white);
+    background: white;
     color: var(--dark-gray);
 }
 

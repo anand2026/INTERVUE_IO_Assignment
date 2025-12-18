@@ -29,7 +29,7 @@ export const RoleSelection = () => {
             <div className="role-selection__container">
                 <div className="role-selection__badge">
                     <IntervueLogo size={14} />
-                    INTERVUE POLL
+                    Intervue Poll
                 </div>
 
                 <h1 className="role-selection__title">

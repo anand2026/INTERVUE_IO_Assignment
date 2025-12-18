@@ -20,18 +20,23 @@ export function setupSocketHandlers(io) {
                 // Only send results if poll has ended (time expired or all answered)
                 // Otherwise, let the student answer
                 let results = null;
+                let timeRemaining = null;
+
                 if (currentPoll) {
                     const pollResults = pollManager.getResults();
+                    timeRemaining = pollResults.timeRemaining;
+
                     const pollEnded = pollResults.timeRemaining === 0 ||
                         pollResults.answeredCount === pollResults.totalStudents;
 
                     // Only send results if poll has actually ended
                     if (pollEnded) {
                         results = pollResults;
+                        timeRemaining = 0;
                     }
                 }
 
-                callback({ success: true, currentPoll, results });
+                callback({ success: true, currentPoll, results, students, timeRemaining });
 
                 // Notify all clients about updated student list
                 io.emit('students:updated', students);
@@ -84,11 +89,13 @@ export function setupSocketHandlers(io) {
                     // Broadcast time update
                     io.emit('poll:timerUpdate', { timeRemaining });
 
-                    // When timer expires, show results
+                    // When timer expires, show results and save to history
                     if (timeRemaining === 0) {
                         clearInterval(timerInterval);
                         const results = pollManager.getResults();
-                        io.emit('poll:timeExpired', results);
+                        pollManager.savePollToHistory(); // Save poll to history
+                        const pollHistory = pollManager.getPollHistory();
+                        io.emit('poll:timeExpired', { results, pollHistory });
                     }
                 }, 1000);
 
@@ -118,15 +125,8 @@ export function setupSocketHandlers(io) {
                 // Broadcast updated results to everyone
                 io.emit('poll:resultsUpdated', results);
 
-                // Check if all students answered
-                const allAnswered = pollManager.canAskNewQuestion();
-                if (allAnswered) {
-                    // Clear timer if all answered
-                    if (timerInterval) {
-                        clearInterval(timerInterval);
-                    }
-                    io.emit('poll:allAnswered', results);
-                }
+                // Note: Timer continues running until it reaches 0
+                // This allows late-joining students to still answer
 
                 console.log(`✍️ ${studentName} submitted answer`);
             } catch (error) {
@@ -193,7 +193,9 @@ export function setupSocketHandlers(io) {
         });
 
         // Get chat history
-        socket.on('chat:getHistory', (callback) => {
+        socket.on('chat:getHistory', (dataOrCallback, maybeCallback) => {
+            // Handle both (callback) and (data, callback) patterns
+            const callback = typeof dataOrCallback === 'function' ? dataOrCallback : maybeCallback;
             const messages = chatManager.getMessages();
             if (callback && typeof callback === 'function') {
                 callback({ success: true, messages });

@@ -9,10 +9,7 @@
 }
 
 .teacher-dashboard.sidebar-open .teacher-dashboard__main {
-    margin-right: 320px;
-    /* Push content or overlay? Side by side usually better */
-    /* Actually for overlay sidebar, we don't need margin. But if we want split view like Figma 667, margin is good. */
-    width: calc(100% - 320px);
+    /* Chat now overlays - no content shift needed */
 }
 
 .teacher-dashboard__header {
@@ -54,6 +51,27 @@
     border-bottom-color: var(--purple-lavender);
 }
 
+.view-history-btn {
+    background: linear-gradient(135deg, #7765DA, #5B9BFA);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(119, 101, 218, 0.3);
+}
+
+.view-history-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(119, 101, 218, 0.4);
+}
+
 .teacher-dashboard__content-wrapper {
     max-width: 800px;
     margin: 40px auto;
@@ -74,13 +92,19 @@
 .badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    background: linear-gradient(135deg, var(--purple-lavender), var(--soft-blue));
-    color: var(--white);
-    padding: 4px 12px;
-    border-radius: var(--radius-full);
-    font-size: 0.7rem;
+    justify-content: center;
+    gap: 7px;
+    width: 134px;
+    height: 31px;
+    background: linear-gradient(90deg, #7565D9 0%, #4D0ACD 100%);
+    color: white;
+    padding: 0 9px;
+    border-radius: 24px;
+    font-family: 'Sora', sans-serif;
     font-weight: 600;
+    font-size: 14px;
+    line-height: 100%;
+    letter-spacing: 0%;
     margin-bottom: 16px;
 }
 
@@ -90,6 +114,47 @@
     line-height: 1.5;
     margin-bottom: 40px;
     font-size: 0.9rem;
+}
+
+/* Results View Styles */
+.results-container {
+    max-width: 727px;
+    margin: 0 auto;
+}
+
+/* Bordered card wrapper containing question bar + results */
+.results-card-wrapper {
+    border-radius: 9px;
+    border: 1px solid #AF8FF1;
+    /* Purple border around entire card */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.results-content {
+    background: white;
+    padding: 24px;
+}
+
+.results-header {
+    margin-bottom: 16px;
+}
+
+.results-label {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--dark-gray);
+}
+
+.results-question-bar {
+    background: #474747;
+    color: white;
+    padding: 16px 20px;
+    border-radius: 0;
+    /* Wrapper handles rounding */
+    font-size: 15px;
+    font-weight: 500;
+    margin: 0;
 }
 
 /* Form Styles */
@@ -216,8 +281,11 @@
     color: var(--medium-gray);
 }
 
-.radio-label input {
-    accent-color: var(--purple-lavender);
+.radio-label input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #7765DA;
 }
 
 .add-option-btn {
@@ -236,4 +304,254 @@
     margin-top: 40px;
     display: flex;
     justify-content: flex-end;
+}
+
+.ask-new-question-container {
+    margin-top: 40px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.ask-new-question-btn {
+    width: 306px;
+    height: 58px;
+    background: linear-gradient(99.18deg, #8F64E1 -46.89%, #1D68BD 223.45%);
+    color: white;
+    border: none;
+    border-radius: 34px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 12px rgba(143, 100, 225, 0.3);
+}
+
+.ask-new-question-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(143, 100, 225, 0.4);
+}
+
+.ask-new-question-btn:active {
+    transform: translateY(0);
+}
+
+/* Poll History Modal Styles */
+.history-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+/* Poll History Full Page View */
+.poll-history-page {
+    background: white;
+    padding: 40px;
+    min-height: 60vh;
+}
+
+.poll-history-title {
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--dark-gray);
+    margin-bottom: 32px;
+}
+
+.poll-history-title strong {
+    font-weight: 700;
+}
+
+.history-empty-page {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--medium-gray);
+}
+
+.history-empty-page p {
+    margin: 8px 0;
+}
+
+.history-list-page {
+    display: flex;
+    flex-direction: column;
+}
+
+.back-btn {
+    margin-top: 24px;
+    padding: 12px 24px;
+    background: var(--purple-lavender);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.back-btn:hover {
+    background: var(--purple-dark);
+}
+
+.history-modal {
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.history-modal__header {
+    padding: 24px 28px;
+    border-bottom: 2px solid var(--off-white);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.history-modal__header h2 {
+    margin: 0;
+    font-size: 24px;
+    color: var(--dark-gray);
+}
+
+.history-modal__close {
+    background: none;
+    border: none;
+    font-size: 32px;
+    color: var(--medium-gray);
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+}
+
+.history-modal__close:hover {
+    color: var(--dark-gray);
+}
+
+.history-modal__content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 28px;
+}
+
+.history-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--medium-gray);
+}
+
+.history-empty p {
+    margin: 8px 0;
+}
+
+.history-hint {
+    font-size: 14px;
+    color: var(--light-gray);
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.history-item {
+    margin-bottom: 32px;
+}
+
+.history-item__label {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--dark-gray);
+    margin-bottom: 12px;
+}
+
+.history-item__card {
+    border-radius: 9px;
+    border: 1px solid #AF8FF1;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.history-item__question-bar {
+    background: #474747;
+    color: white;
+    padding: 16px 20px;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.history-item__options {
+    background: white;
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.history-item__option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.history-item__option-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 120px;
+}
+
+.history-item__option-circle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #7765DA;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.history-item__option-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--dark-gray);
+}
+
+.history-item__option-bar-container {
+    flex: 1;
+    height: 40px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.history-item__option-bar-fill {
+    height: 100%;
+    background: #7765DA;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.history-item__option-percentage {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--dark-gray);
+    min-width: 50px;
+    text-align: right;
 }

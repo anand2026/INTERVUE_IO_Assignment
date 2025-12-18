@@ -4,58 +4,70 @@
     align-items: center;
     justify-content: center;
     padding: var(--spacing-lg);
+    background: white;
 }
 
 .student-name__container {
-    max-width: 600px;
+    max-width: 762px;
     width: 100%;
-    background: var(--white);
-    border-radius: var(--radius-xl);
-    padding: var(--spacing-2xl);
-    box-shadow: var(--shadow-lg);
     text-align: center;
 }
 
 .student-name__badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    background: linear-gradient(135deg, var(--purple-lavender), var(--soft-blue));
-    color: var(--white);
-    padding: 8px 16px;
-    border-radius: var(--radius-full);
+    justify-content: center;
+    gap: 7px;
+    width: 134px;
+    height: 31px;
+    background: linear-gradient(90deg, #7565D9 0%, #4D0ACD 100%);
+    color: white;
+    padding: 0 9px;
+    border-radius: 24px;
+    font-family: 'Sora', sans-serif;
     font-weight: 600;
-    font-size: 0.75rem;
+    font-size: 14px;
+    line-height: 100%;
+    letter-spacing: 0%;
     margin-bottom: var(--spacing-lg);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
 
 .student-name__title {
-    font-size: 2rem;
+    font-family: 'Sora', sans-serif;
     font-weight: 400;
-    /* Regular weight for "Let's", bold is in <strong> */
+    font-size: 40px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    text-align: center;
     color: var(--dark-gray);
     margin-bottom: var(--spacing-sm);
+    max-width: 737px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .student-name__title strong {
-    font-weight: 800;
+    font-weight: 700;
 }
 
 .student-name__subtitle {
-    font-size: 0.95rem;
+    font-family: 'Sora', sans-serif;
+    font-weight: 400;
+    font-size: 19px;
+    line-height: 25px;
+    letter-spacing: 0%;
+    text-align: center;
     color: var(--medium-gray);
-    line-height: 1.6;
     margin-bottom: var(--spacing-2xl);
-    max-width: 500px;
+    max-width: 762px;
     margin-left: auto;
     margin-right: auto;
 }
 
 .student-name__subtitle strong {
-    color: var(--dark-gray);
+    font-family: 'Sora', sans-serif;
     font-weight: 600;
+    color: var(--dark-gray);
 }
 
 .student-name__form {
@@ -65,32 +77,39 @@
 }
 
 .student-name__input-group {
+    width: 507px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
     text-align: left;
+    margin: 0 auto;
 }
 
 .student-name__label {
     display: block;
-    font-weight: 600;
-    color: var(--dark-gray);
-    margin-bottom: var(--spacing-sm);
-    font-size: 0.875rem;
+    font-family: 'Sora', sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    color: #000000;
 }
 
 .student-name__input {
     width: 100%;
-    padding: var(--spacing-md);
-    border: 2px solid var(--off-white);
-    border-radius: var(--radius-md);
+    height: 54px;
+    padding: 0 var(--spacing-md);
+    border: none;
+    border-radius: 8px;
     font-size: 1rem;
     transition: all 0.3s ease;
-    background: var(--off-white);
+    background: #F5F5F5;
     color: var(--dark-gray);
 }
 
 .student-name__input:focus {
     outline: none;
-    border-color: var(--purple-lavender);
-    background: var(--white);
+    background: #F5F5F5;
 }
 
 .student-name__input:disabled {

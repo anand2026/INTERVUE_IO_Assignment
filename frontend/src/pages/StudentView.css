@@ -1,3 +1,8 @@
+.student-view {
+    min-height: 100vh;
+    background: white;
+}
+
 .student-view__header {
     height: 60px;
     display: flex;
@@ -5,7 +10,7 @@
     justify-content: space-between;
     padding: 0 40px;
     background: white;
-    border-bottom: 1px solid #eee;
+    border-bottom: none;
     position: fixed;
     top: 0;
     width: 100%;
@@ -23,88 +28,148 @@
 }
 
 .student-view.sidebar-open .student-view__main {
-    margin-right: 320px;
+    /* Chat overlays - no content shift */
 }
 
-.waiting-simple {
-    text-align: center;
-    margin-top: 20vh;
-    color: var(--dark-gray);
+/* Waiting State - When teacher hasn't asked question */
+.waiting-state {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    background: white;
+    z-index: 100;
 }
 
-.pulse-icon {
-    color: var(--purple-lavender);
-    animation: pulse 2s infinite;
-    margin-bottom: 20px;
+.waiting-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    width: 134px;
+    height: 31px;
+    background: linear-gradient(90deg, #7565D9 0%, #4D0ACD 100%);
+    color: white;
+    padding: 0 9px;
+    border-radius: 24px;
+    font-family: 'Sora', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 100%;
+    letter-spacing: 0%;
 }
 
-@keyframes pulse {
+.waiting-badge__icon {
+    font-size: 14px;
+}
+
+.waiting-spinner {
+    width: 57px;
+    height: 58px;
+    border: 4px solid transparent;
+    border-top: 4px solid #500ECE;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
     0% {
-        transform: scale(1);
-        opacity: 1;
-    }
-
-    50% {
-        transform: scale(1.1);
-        opacity: 0.8;
+        transform: rotate(0deg);
     }
 
     100% {
-        transform: scale(1);
-        opacity: 1;
+        transform: rotate(360deg);
     }
 }
 
-.poll-card {
-    background: white;
-    /* No shadow on Figma? It looks clean white or very subtle. */
-    /* Figma images show simple layout. */
+.waiting-text {
+    font-family: 'Sora', sans-serif;
+    font-weight: 600;
+    font-size: 33px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    text-align: center;
+    color: var(--dark-gray);
+    max-width: 737px;
 }
 
-.poll-header {
+/* Poll Display Container - matches teacher view structure */
+.poll-display-container {
+    max-width: 727px;
+    margin: 0 auto;
+}
+
+.poll-label-row {
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
 }
 
-.q-label {
+.poll-label {
+    font-family: 'Sora', sans-serif;
+    font-size: 18px;
     font-weight: 700;
-    font-size: 0.9rem;
     color: var(--dark-gray);
 }
 
-.poll-question {
+/* Bordered card wrapper containing question bar + content */
+.poll-card-wrapper {
+    width: 727px;
+    border-radius: 9px;
+    border: 1px solid #AF8FF1;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.poll-question-bar {
     background: #474747;
-    /* Based on dark header in Desktop 658 */
     color: white;
-    padding: 12px 16px;
-    border-radius: 8px 8px 0 0;
-    /* Or just full rounded if separate */
-    font-size: 1rem;
-    margin-bottom: 20px;
+    padding: 16px 20px;
+    font-size: 15px;
     font-weight: 500;
+    margin: 0;
+}
+
+.poll-content {
+    background: white;
+    padding: 24px;
 }
 
 .poll-options {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
 }
 
 .poll-option {
+    width: 678px;
+    height: 55px;
     display: flex;
     align-items: center;
-    background: #f5f5f5;
-    padding: 12px 16px;
+    background: white;
+    padding: 0 21px;
     border-radius: 6px;
     cursor: pointer;
-    border: 1px solid transparent;
+    border: 1.5px solid #E5E5E5;
     transition: all 0.2s;
+    box-sizing: border-box;
+}
+
+.poll-option:hover {
+    border-color: #8F64E1;
 }
 
 .poll-option.selected {
-    border-color: var(--purple-lavender);
-    background: #F0EDFF;
+    border: 1.5px solid #8F64E1;
+    background: white;
 }
 
 .opt-number {
@@ -132,8 +197,15 @@
 }
 
 .wait-footer {
-    text-align: center;
-    margin-top: 40px;
+    font-family: 'Sora', sans-serif;
     font-weight: 600;
+    font-size: 24px;
+    line-height: 100%;
+    text-align: center;
     color: var(--dark-gray);
+    margin-top: 40px;
+    width: 100%;
+    max-width: 737px;
+    margin-left: auto;
+    margin-right: auto;
 }

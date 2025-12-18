@@ -17,13 +17,24 @@ export const Sidebar = ({ activeTab: initialTab, onClose, isTeacher = false }) =
     useEffect(() => {
         // Load chat history if opening chat tab
         if (activeTab === 'chat') {
+            // Ensure socket is connected
+            const socket = socketService.getSocket();
+            if (!socket?.connected) {
+                console.warn('Socket not connected, reconnecting...');
+                socketService.connect();
+            }
+
             socketService.emit('chat:getHistory')
                 .then((response) => {
                     if (response && response.messages) {
                         dispatch(setMessages(response.messages));
                     }
                 })
-                .catch(console.error);
+                .catch((error) => {
+                    console.error('Failed to load chat history:', error);
+                    // Set empty messages to prevent stale data
+                    dispatch(setMessages([]));
+                });
         }
     }, [activeTab, dispatch]);
 
@@ -98,17 +109,19 @@ export const Sidebar = ({ activeTab: initialTab, onClose, isTeacher = false }) =
                             </div>
                         ) : (
                             messages.map((msg) => {
-                                const isOwnMessage = msg.sender === name;
+                                // For teachers: own messages are from "Teacher"
+                                // For students: own messages match their name
+                                const isOwnMessage = isTeacher
+                                    ? msg.sender === 'Teacher'
+                                    : msg.sender === name;
                                 return (
                                     <div
                                         key={msg.id}
-                                        className={`chat-message ${isOwnMessage ? 'chat-message--own' : ''}`}
+                                        className={`chat-message ${isOwnMessage ? 'chat-message--self' : 'chat-message--other'}`}
                                     >
-                                        {!isOwnMessage && (
-                                            <span className="chat-message__sender">
-                                                {msg.sender}
-                                            </span>
-                                        )}
+                                        <span className="chat-message__sender">
+                                            {msg.sender}
+                                        </span>
                                         <div className="chat-message__bubble">
                                             <div className="chat-message__text">{msg.message}</div>
                                         </div>

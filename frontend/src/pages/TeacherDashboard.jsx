@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Zap } from 'lucide-react';
+import { Zap, Eye } from 'lucide-react';
 import { Button } from '../components/Button';
 import { Timer } from '../components/Timer';
 import { PollResults } from '../components/PollResults';
@@ -28,6 +28,9 @@ export const TeacherDashboard = () => {
 
     const [activeTab, setActiveTab] = useState(null); // 'chat' or 'participants'
     const [isChatOpen, setIsChatOpen] = useState(false);
+    const [showHistory, setShowHistory] = useState(false);
+    const [pollHistory, setPollHistory] = useState([]);
+    const [showCreateForm, setShowCreateForm] = useState(true); // Start with form, then show results
 
     // Poll Creation State
     const [question, setQuestion] = useState('');
@@ -49,6 +52,7 @@ export const TeacherDashboard = () => {
                     dispatch(setStudents(response.students || []));
                     if (response.currentPoll) dispatch(setCurrentPoll(response.currentPoll));
                     if (response.results) dispatch(setResults(response.results));
+                    if (response.pollHistory) setPollHistory(response.pollHistory);
                 }
             })
             .catch(console.error);
@@ -56,20 +60,22 @@ export const TeacherDashboard = () => {
         const handleStudentsUpdated = (updated) => dispatch(setStudents(updated));
         const handleResultsUpdated = (updated) => dispatch(setResults(updated));
         const handleTimerUpdate = ({ timeRemaining }) => dispatch(setTimeRemaining(timeRemaining));
-        const handleEnd = (final) => dispatch(setResults(final));
+        const handleTimeExpired = (data) => {
+            // Handle new format: { results, pollHistory }
+            dispatch(setResults(data.results || data));
+            if (data.pollHistory) setPollHistory(data.pollHistory);
+        };
 
         socketService.on('students:updated', handleStudentsUpdated);
         socketService.on('poll:resultsUpdated', handleResultsUpdated);
         socketService.on('poll:timerUpdate', handleTimerUpdate);
-        socketService.on('poll:timeExpired', handleEnd);
-        socketService.on('poll:allAnswered', handleEnd);
+        socketService.on('poll:timeExpired', handleTimeExpired);
 
         return () => {
             socketService.off('students:updated', handleStudentsUpdated);
             socketService.off('poll:resultsUpdated', handleResultsUpdated);
             socketService.off('poll:timerUpdate', handleTimerUpdate);
-            socketService.off('poll:timeExpired', handleEnd);
-            socketService.off('poll:allAnswered', handleEnd);
+            socketService.off('poll:timeExpired', handleTimeExpired);
         };
     }, [dispatch, role, navigate]);
 
@@ -114,14 +120,24 @@ export const TeacherDashboard = () => {
         setOptions(newOpts);
     };
 
+    const toggleCorrectOption = (index, value) => {
+        const newOpts = options.map((opt, i) => ({
+            ...opt,
+            isCorrect: i === index ? value : opt.isCorrect
+        }));
+        setOptions(newOpts);
+    };
+
     const addOption = () => {
         if (options.length < 6) {
             setOptions([...options, { text: '', isCorrect: false }]);
         }
     };
 
-    // Check if we can show create poll form (no active poll or poll ended)
-    const canCreate = !currentPoll || (results && (timeRemaining === 0 || results.answeredCount === results.totalStudents));
+    // Determine if we should show create form or results
+    // Show form ONLY when: showCreateForm is true AND no active poll/results
+    // Show results when: poll exists OR results exist (regardless of showCreateForm)
+    const canCreate = showCreateForm && !currentPoll && !results;
 
     return (
         <div className={`teacher-dashboard fade-in ${activeTab ? 'sidebar-open' : ''}`}>
@@ -130,33 +146,78 @@ export const TeacherDashboard = () => {
                 <div className="teacher-dashboard__header">
                     <div className="brand">
                         <IntervueLogo size={16} />
-                        <span>INTERVUE POLL</span>
+                        <span>Intervue Poll</span>
                     </div>
                     <div className="header-actions">
                         <button
-                            className={`header-tab ${activeTab === 'chat' ? 'active' : ''}`}
-                            onClick={() => setActiveTab(activeTab === 'chat' ? null : 'chat')}
+                            className="view-history-btn"
+                            onClick={() => setShowHistory(true)}
                         >
-                            Chat
-                        </button>
-                        <button
-                            className={`header-tab ${activeTab === 'participants' ? 'active' : ''}`}
-                            onClick={() => setActiveTab(activeTab === 'participants' ? null : 'participants')}
-                        >
-                            Participants
+                            <Eye size={18} />
+                            View Poll history
                         </button>
                     </div>
                 </div>
 
                 <div className="teacher-dashboard__content-wrapper">
-                    {/* Create Poll Section */}
-                    {canCreate ? (
+                    {/* Poll History View - Full Page */}
+                    {showHistory ? (
+                        <div className="poll-history-page">
+                            <h2 className="poll-history-title">View <strong>Poll History</strong></h2>
+                            {pollHistory.length === 0 ? (
+                                <div className="history-empty-page">
+                                    <p>No polls completed yet in this session.</p>
+                                    <p className="history-hint">Completed polls will appear here after you ask new questions.</p>
+                                    <button className="back-btn" onClick={() => setShowHistory(false)}>
+                                        ← Back to Dashboard
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="history-list-page">
+                                    {pollHistory.map((poll, index) => {
+                                        // Votes are inside poll.results.votes
+                                        const votes = poll.results?.votes || poll.votes || [];
+                                        const totalVotes = votes.reduce((a, b) => a + b, 0);
+                                        return (
+                                            <div key={index} className="history-item">
+                                                <div className="history-item__label">Question {index + 1}</div>
+                                                <div className="history-item__card">
+                                                    <div className="history-item__question-bar">{poll.question}</div>
+                                                    <div className="history-item__options">
+                                                        {poll.options.map((option, optIndex) => {
+                                                            const voteCount = votes[optIndex] || 0;
+                                                            const percentage = totalVotes > 0 ? ((voteCount / totalVotes) * 100).toFixed(0) : 0;
+                                                            return (
+                                                                <div key={optIndex} className="history-item__option">
+                                                                    <div className="history-item__option-info">
+                                                                        <span className="history-item__option-circle">{optIndex + 1}</span>
+                                                                        <span className="history-item__option-text">{option}</span>
+                                                                    </div>
+                                                                    <div className="history-item__option-bar-container">
+                                                                        <div
+                                                                            className="history-item__option-bar-fill"
+                                                                            style={{ width: `${percentage}%` }}
+                                                                        />
+                                                                    </div>
+                                                                    <span className="history-item__option-percentage">{percentage}%</span>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    ) : canCreate ? (
                         <div className="create-poll-card">
                             <div className="card-header">
                                 <div>
                                     <div className="badge">
                                         <IntervueLogo size={12} />
-                                        INTERVUE POLL
+                                        Intervue Poll
                                     </div>
                                     <h1 className="title">Let's <strong>Get Started</strong></h1>
                                     <p className="subtitle">
@@ -212,18 +273,18 @@ export const TeacherDashboard = () => {
                                                 <label className={`radio-label ${opt.isCorrect ? 'active' : ''}`}>
                                                     <input
                                                         type="radio"
-                                                        name="correctOption"
+                                                        name={`correctOption_${idx}`}
                                                         checked={opt.isCorrect}
-                                                        onChange={() => setCorrectOption(idx)}
+                                                        onChange={() => toggleCorrectOption(idx, true)}
                                                     />
                                                     Yes
                                                 </label>
                                                 <label className={`radio-label ${!opt.isCorrect ? 'active' : ''}`}>
                                                     <input
                                                         type="radio"
-                                                        name="correctOption"
+                                                        name={`correctOption_${idx}`}
                                                         checked={!opt.isCorrect}
-                                                        onChange={() => { /* No-op, handled by Yes click usually, or toggle off? Assuming single correct answer */ }}
+                                                        onChange={() => toggleCorrectOption(idx, false)}
                                                     />
                                                     No
                                                 </label>
@@ -247,36 +308,66 @@ export const TeacherDashboard = () => {
                         </div>
                     ) : (
                         /* Live Results View */
-                        <div className="results-view">
+                        <div className="results-container">
                             <div className="results-header">
-                                <span>Question 1</span>
-                                <Timer timeRemaining={timeRemaining} />
+                                <span className="results-label">Question</span>
                             </div>
-                            <h2 className="results-question">{currentPoll?.question}</h2>
 
-                            {/* Always show results, even if empty */}
-                            {results ? (
-                                <PollResults results={results} isTeacher={true} />
-                            ) : (
-                                /* Show initial empty results structure */
-                                <PollResults results={{
-                                    pollId: currentPoll?.id,
-                                    question: currentPoll?.question,
-                                    options: currentPoll?.options || [],
-                                    votes: new Array(currentPoll?.options?.length || 0).fill(0),
-                                    studentAnswers: [],
-                                    totalStudents: 0,
-                                    answeredCount: 0,
-                                    timeRemaining: timeRemaining
-                                }} />
-                            )}
+                            {/* Bordered card containing question bar + results */}
+                            <div className="results-card-wrapper">
+                                <div className="results-question-bar">{currentPoll?.question}</div>
+                                <div className="results-content">
+                                    {results ? (
+                                        <PollResults results={results} isTeacher={true} />
+                                    ) : (
+                                        <PollResults results={{
+                                            pollId: currentPoll?.id,
+                                            question: currentPoll?.question,
+                                            options: currentPoll?.options || [],
+                                            votes: new Array(currentPoll?.options?.length || 0).fill(0),
+                                            studentAnswers: [],
+                                            totalStudents: 0,
+                                            answeredCount: 0,
+                                            timeRemaining: timeRemaining
+                                        }} />
+                                    )}
+                                </div>
+                            </div>
 
-                            {/* Show 'Ask New Question' only if finished */}
-                            {(!currentPoll || (results && results.answeredCount === results.totalStudents)) && (
-                                <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-                                    <Button onClick={() => dispatch(setCurrentPoll(null))}>
-                                        Create New Poll
-                                    </Button>
+                            {/* Ask New Question button - OUTSIDE the card */}
+                            {results && (
+                                <div className="ask-new-question-container">
+                                    <button
+                                        className="ask-new-question-btn"
+                                        onClick={() => {
+                                            // Save current poll to history before clearing
+                                            if (currentPoll && results) {
+                                                setPollHistory(prev => [...prev, {
+                                                    question: currentPoll.question,
+                                                    options: currentPoll.options,
+                                                    endedAt: new Date().toISOString(),
+                                                    totalResponses: results.answeredCount || 0,
+                                                    votes: results.votes || []
+                                                }]);
+                                            }
+
+                                            // End poll via socket (fire and forget)
+                                            socketService.emit('teacher:endPoll').catch(() => { });
+
+                                            // Clear Redux state
+                                            dispatch(setCurrentPoll(null));
+                                            dispatch(setResults(null));
+
+                                            // Reset form fields
+                                            setQuestion('');
+                                            setOptions([{ text: '', isCorrect: false }, { text: '', isCorrect: false }]);
+
+                                            // Show create form
+                                            setShowCreateForm(true);
+                                        }}
+                                    >
+                                        + Ask a new question
+                                    </button>
                                 </div>
                             )}
                         </div>

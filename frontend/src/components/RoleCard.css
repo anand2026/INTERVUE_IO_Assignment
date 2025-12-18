@@ -1,50 +1,47 @@
 .role-card {
     background: var(--white);
-    border: 1.5px solid #eee;
-    /* Subtle border as per clean UI */
-    border-radius: 16px;
-    /* Larger radius */
-    padding: 32px;
-    /* Genereous padding */
+    border: 1px solid #D9D9D9;
+    border-radius: 10px;
+    padding: 15px 17px 15px 25px;
     cursor: pointer;
     transition: all 0.2s ease;
-    width: 380px;
-    /* Fixed width to match "box size" expectation */
-    height: 220px;
-    /* Fixed height for uniformity */
+    width: 387px;
+    height: 143px;
     text-align: left;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    /* Center content vertically if needed, or flex-start */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    gap: 17px;
+    box-shadow: none;
+    position: relative;
 }
 
 .role-card:hover {
-    border-color: var(--purple-lavender);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(119, 101, 218, 0.1);
+    border-color: #7765DA;
 }
 
 .role-card.selected {
-    border-color: var(--purple-lavender);
-    border-width: 2px;
-    background: white;
-    /* Often selected state is just border, or subtle tint */
-    box-shadow: 0 0 0 4px rgba(119, 101, 218, 0.1);
-    /* Glow effect */
+    border: 3px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+        linear-gradient(92.24deg, #7765DA -8.5%, #1D68BD 101.3%) border-box;
+    box-shadow: none;
 }
 
 .role-card__title {
-    font-size: 1.5rem;
-    /* Larger title */
-    font-weight: 800;
+    font-family: 'Sora', sans-serif;
+    font-weight: 600;
+    font-size: 23px;
+    line-height: 100%;
+    letter-spacing: 0%;
     color: var(--dark-gray);
-    margin-bottom: 12px;
+    margin-bottom: 0;
 }
 
 .role-card__description {
-    font-size: 0.95rem;
+    font-family: 'Sora', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 100%;
+    letter-spacing: 0%;
     color: #666;
-    line-height: 1.6;
 }

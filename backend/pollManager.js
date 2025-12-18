@@ -23,7 +23,9 @@ class PollManager {
     canAskNewQuestion() {
         if (!this.currentPoll) return true;
 
-        // All students must have answered
+        // Allow new question if timer expired OR all students answered
+        if (this.timeRemaining === 0) return true;
+
         const allAnswered = Array.from(this.students.values()).every(
             student => student.hasAnswered
         );
@@ -181,12 +183,22 @@ class PollManager {
     // Save current poll to history
     savePollToHistory() {
         if (this.currentPoll) {
-            const results = this.getResults();
-            this.pollHistory.push({
-                ...this.currentPoll,
-                results,
-                completedAt: Date.now()
-            });
+            // Check if poll is already in history (prevent duplicates)
+            const alreadySaved = this.pollHistory.some(p => p.id === this.currentPoll.id);
+            if (!alreadySaved) {
+                const results = this.getResults();
+                console.log('📊 Saving poll to history:', {
+                    question: this.currentPoll.question,
+                    votes: results?.votes,
+                    answeredCount: results?.answeredCount,
+                    answersMap: Array.from(this.answers.entries())
+                });
+                this.pollHistory.push({
+                    ...this.currentPoll,
+                    results,
+                    completedAt: Date.now()
+                });
+            }
         }
     }
 

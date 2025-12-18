@@ -29,11 +29,23 @@ export const StudentView = () => {
     const [activeTab, setActiveTab] = useState(null);
     const [isChatOpen, setIsChatOpen] = useState(false);
 
+    // Use ref to access hasAnswered in socket listeners without re-registering
+    const hasAnsweredRef = React.useRef(hasAnswered);
+    hasAnsweredRef.current = hasAnswered;
+
     useEffect(() => {
         if (!name) {
             navigate('/student/name');
             return;
         }
+
+        // Clean up any existing listeners first to prevent duplicates
+        socketService.off('poll:new');
+        socketService.off('poll:resultsUpdated');
+        socketService.off('poll:timerUpdate');
+        socketService.off('poll:timeExpired');
+        socketService.off('student:removed');
+        socketService.off('students:updated');
 
         socketService.on('poll:new', (poll) => {
             dispatch(setCurrentPoll(poll));
@@ -45,15 +57,17 @@ export const StudentView = () => {
 
         socketService.on('poll:resultsUpdated', (res) => dispatch(setResults(res)));
         socketService.on('poll:timerUpdate', ({ timeRemaining }) => dispatch(setTimeRemaining(timeRemaining)));
-        socketService.on('poll:timeExpired', (res) => {
-            dispatch(setResults(res));
-            setShowResults(true);
-            dispatch(setHasAnswered(true));
+        socketService.on('poll:timeExpired', (data) => {
+            // Handle new format: { results, pollHistory }
+            dispatch(setResults(data.results || data));
+            dispatch(setTimeRemaining(0));
+            // Only show results if student already answered (use ref to get current value)
+            if (hasAnsweredRef.current) {
+                setShowResults(true);
+            }
+            // If student hasn't answered, they'll see waiting page due to timeRemaining === 0
         });
-        socketService.on('poll:allAnswered', (res) => {
-            dispatch(setResults(res));
-            setShowResults(true);
-        });
+        // Timer continues until 0 - no more poll:allAnswered event
         socketService.on('student:removed', () => {
             console.log('🔴 KICKOUT EVENT RECEIVED');
 
@@ -111,7 +125,6 @@ export const StudentView = () => {
             socketService.off('poll:resultsUpdated');
             socketService.off('poll:timerUpdate');
             socketService.off('poll:timeExpired');
-            socketService.off('poll:allAnswered');
             socketService.off('student:removed');
             socketService.off('students:updated');
         };
@@ -141,21 +154,7 @@ export const StudentView = () => {
             <div className="student-view__header">
                 <div className="brand">
                     <IntervueLogo size={16} />
-                    <span>INTERVUE POLL</span>
-                </div>
-                <div className="header-actions">
-                    <button
-                        className={`header-tab ${activeTab === 'chat' ? 'active' : ''}`}
-                        onClick={() => setActiveTab(activeTab === 'chat' ? null : 'chat')}
-                    >
-                        Chat
-                    </button>
-                    <button
-                        className={`header-tab ${activeTab === 'participants' ? 'active' : ''}`}
-                        onClick={() => setActiveTab(activeTab === 'participants' ? null : 'participants')}
-                    >
-                        Participants
-                    </button>
+                    <span>Intervue Poll</span>
                 </div>
             </div>
 
@@ -164,7 +163,7 @@ export const StudentView = () => {
                 {!currentPoll && (
                     <div className="waiting-card">
                         <div className="brand-badge-center">
-                            <IntervueLogo size={12} /> INTERVUE POLL
+                            <IntervueLogo size={12} /> Intervue Poll
                         </div>
                         <h2 className="waiting-title">Let's <strong>Get Started</strong></h2>
                         <p className="waiting-text">
@@ -187,36 +186,45 @@ export const StudentView = () => {
                 )}
 
                 {/* 
-           Actually, if !currentPoll, it means we are waiting for the FIRST poll or NEXT poll.
-           Desktop-660 shows "Wait for the teacher to ask a new question.." with results of previous?
+           Show waiting state when:
+           1. No current poll and no results
+           2. Timer is 0 (poll ended - for ALL students, whether they responded or not)
         */}
 
-                {!currentPoll && !results && (
-                    <div className="waiting-simple">
-                        <IntervueLogo size={24} className="pulse-icon" />
-                        <h3>Wait for the teacher to ask questions..</h3>
+                {((!currentPoll && !results) || (timeRemaining === 0)) && (
+                    <div className="waiting-state">
+                        <div className="waiting-badge">
+                            <span className="waiting-badge__icon">✦</span>
+                            Intervue Poll
+                        </div>
+                        <div className="waiting-spinner"></div>
+                        <h3 className="waiting-text">Wait for the teacher to ask questions..</h3>
                     </div>
                 )}
 
-                {currentPoll && !showResults && !hasAnswered && (
-                    <div className="poll-card">
-                        <div className="poll-header">
-                            <span className="q-label">Question 1</span>
+                {/* Show poll only when timer > 0 and student hasn't answered */}
+                {currentPoll && timeRemaining > 0 && !showResults && !hasAnswered && (
+                    <div className="poll-display-container">
+                        <div className="poll-label-row">
+                            <span className="poll-label">Question 1</span>
                             <Timer timeRemaining={timeRemaining} />
                         </div>
-                        <h2 className="poll-question">{currentPoll.question}</h2>
-
-                        <div className="poll-options">
-                            {currentPoll.options.map((opt, idx) => (
-                                <div
-                                    key={idx}
-                                    className={`poll-option ${selectedOption === idx ? 'selected' : ''}`}
-                                    onClick={() => setSelectedOption(idx)}
-                                >
-                                    <span className="opt-number">{idx + 1}</span>
-                                    <span className="opt-text">{opt}</span>
+                        <div className="poll-card-wrapper">
+                            <div className="poll-question-bar">{currentPoll.question}</div>
+                            <div className="poll-content">
+                                <div className="poll-options">
+                                    {currentPoll.options.map((opt, idx) => (
+                                        <div
+                                            key={idx}
+                                            className={`poll-option ${selectedOption === idx ? 'selected' : ''}`}
+                                            onClick={() => setSelectedOption(idx)}
+                                        >
+                                            <span className="opt-number">{idx + 1}</span>
+                                            <span className="opt-text">{opt}</span>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
+                            </div>
                         </div>
 
                         <div className="poll-actions">
@@ -231,15 +239,17 @@ export const StudentView = () => {
                 )}
 
                 {(showResults || hasAnswered) && results && (
-                    <div className="poll-card">
-                        <div className="poll-header">
-                            <span className="q-label">Question 1</span>
-                            <span className="timer-stopped">00:00</span>
+                    <div className="poll-display-container">
+                        <div className="poll-label-row">
+                            <span className="poll-label">Question 1</span>
+                            <Timer timeRemaining={timeRemaining} />
                         </div>
-                        <h2 className="poll-question">{currentPoll ? currentPoll.question : "Poll Ended"}</h2>
-
-                        <PollResults results={results} isTeacher={false} />
-
+                        <div className="poll-card-wrapper">
+                            <div className="poll-question-bar">{currentPoll ? currentPoll.question : "Poll Ended"}</div>
+                            <div className="poll-content">
+                                <PollResults results={results} isTeacher={false} />
+                            </div>
+                        </div>
                         <p className="wait-footer">Wait for the teacher to ask a new question..</p>
                     </div>
                 )}
