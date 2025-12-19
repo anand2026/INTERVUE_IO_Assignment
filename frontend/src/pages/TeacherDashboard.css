@@ -153,6 +153,9 @@
 .results-container {
     max-width: 727px;
     margin: 0 auto;
+    position: relative;
+    left: 65%;
+    transform: translateX(-50%);
 }
 
 /* Bordered card wrapper containing question bar + results */
@@ -448,6 +451,10 @@
     background: white;
     padding: 40px;
     min-height: 60vh;
+    max-width: 727px;
+    position: relative;
+    left: 65%;
+    transform: translateX(-50%);
 }
 
 .poll-history-title {
