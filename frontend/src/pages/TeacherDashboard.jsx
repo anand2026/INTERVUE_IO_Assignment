@@ -143,8 +143,8 @@ export const TeacherDashboard = () => {
     return (
         <div className={`teacher-dashboard fade-in ${activeTab ? 'sidebar-open' : ''}`}>
             <div className="teacher-dashboard__main">
-                {/* View Poll history button - hide when viewing poll history */}
-                {!showHistory && (
+                {/* View Poll history button - hide when viewing poll history or when history is empty */}
+                {!showHistory && pollHistory.length > 0 && (
                     <button
                         className="view-history-btn"
                         onClick={() => setShowHistory(true)}
