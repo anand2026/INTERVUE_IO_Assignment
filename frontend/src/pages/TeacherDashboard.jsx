@@ -155,8 +155,8 @@ export const TeacherDashboard = () => {
         return (
             <div className="teacher-dashboard fade-in">
                 <div className="teacher-dashboard__main">
-                    <div className="teacher-dashboard__content-wrapper" style={{ textAlign: 'center', paddingTop: '100px' }}>
-                        <p>Loading...</p>
+                    <div className="teacher-dashboard__content-wrapper" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+                        <div className="loading-spinner"></div>
                     </div>
                 </div>
             </div>
