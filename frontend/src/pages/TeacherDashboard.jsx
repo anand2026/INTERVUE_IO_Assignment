@@ -166,16 +166,6 @@ export const TeacherDashboard = () => {
     return (
         <div className={`teacher-dashboard fade-in ${activeTab ? 'sidebar-open' : ''}`}>
             <div className="teacher-dashboard__main">
-                {/* View Poll history button - hide when viewing poll history or when history is empty */}
-                {!showHistory && pollHistory.length > 0 && (
-                    <button
-                        className="view-history-btn"
-                        onClick={() => setShowHistory(true)}
-                    >
-                        <img src={EyeIcon} alt="" width={24} height={24} />
-                        View Poll history
-                    </button>
-                )}
                 <div className="teacher-dashboard__content-wrapper">
                     {/* Poll History View - Full Page */}
                     {showHistory ? (
@@ -277,8 +267,8 @@ export const TeacherDashboard = () => {
 
                                     {options.map((opt, idx) => (
                                         <div key={idx} className="option-row">
+                                            <span className="option-number">{idx + 1}</span>
                                             <div className="option-input-wrapper">
-                                                <span className="option-number">{idx + 1}</span>
                                                 <input
                                                     type="text"
                                                     value={opt.text}
@@ -316,10 +306,13 @@ export const TeacherDashboard = () => {
                                     )}
                                 </div>
 
-                                <div className="form-actions">
-                                    <Button type="submit" variant="primary" disabled={loading}>
-                                        Ask Question
-                                    </Button>
+                                <div className="footer-wrapper">
+                                    <div className="footer-line"></div>
+                                    <div className="form-actions">
+                                        <Button type="submit" variant="primary" disabled={loading}>
+                                            Ask Question
+                                        </Button>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -392,11 +385,24 @@ export const TeacherDashboard = () => {
                 </div>
             </div>
 
-            {/* Chat Button - Bottom Right */}
-            <ChatButton onClick={() => {
-                setIsChatOpen(!isChatOpen);
-                if (!isChatOpen) setActiveTab('chat'); // Default to chat tab when opening
-            }} />
+            {/* View Poll history button - only show on results page, not create form */}
+            {!canCreate && !showHistory && pollHistory.length > 0 && (
+                <button
+                    className="view-history-btn"
+                    onClick={() => setShowHistory(true)}
+                >
+                    <img src={EyeIcon} alt="" width={24} height={24} />
+                    View Poll history
+                </button>
+            )}
+
+            {/* Chat Button - only show on results page, not create form */}
+            {!canCreate && (
+                <ChatButton onClick={() => {
+                    setIsChatOpen(!isChatOpen);
+                    if (!isChatOpen) setActiveTab('chat');
+                }} />
+            )}
 
             {/* Sidebar Modal */}
             {isChatOpen && (
