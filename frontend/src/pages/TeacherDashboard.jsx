@@ -31,7 +31,8 @@ export const TeacherDashboard = () => {
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [showHistory, setShowHistory] = useState(false);
     const [pollHistory, setPollHistory] = useState([]);
-    const [showCreateForm, setShowCreateForm] = useState(true); // Start with form, then show results
+    const [showCreateForm, setShowCreateForm] = useState(false); // Start hidden, show after sync
+    const [isLoading, setIsLoading] = useState(true); // Loading state for initial sync
 
     // Poll Creation State
     const [question, setQuestion] = useState('');
@@ -54,9 +55,18 @@ export const TeacherDashboard = () => {
                     if (response.currentPoll) dispatch(setCurrentPoll(response.currentPoll));
                     if (response.results) dispatch(setResults(response.results));
                     if (response.pollHistory) setPollHistory(response.pollHistory);
+                    // Only show create form if no active poll and no results
+                    setShowCreateForm(!response.currentPoll && !response.results);
+                } else {
+                    setShowCreateForm(true);
                 }
+                setIsLoading(false);
             })
-            .catch(console.error);
+            .catch((err) => {
+                console.error(err);
+                setShowCreateForm(true);
+                setIsLoading(false);
+            });
 
         const handleStudentsUpdated = (updated) => dispatch(setStudents(updated));
         const handleResultsUpdated = (updated) => dispatch(setResults(updated));
@@ -139,6 +149,19 @@ export const TeacherDashboard = () => {
     // Show form ONLY when: showCreateForm is true AND no active poll/results
     // Show results when: poll exists OR results exist (regardless of showCreateForm)
     const canCreate = showCreateForm && !currentPoll && !results;
+
+    // Show loading while syncing initial state
+    if (isLoading) {
+        return (
+            <div className="teacher-dashboard fade-in">
+                <div className="teacher-dashboard__main">
+                    <div className="teacher-dashboard__content-wrapper" style={{ textAlign: 'center', paddingTop: '100px' }}>
+                        <p>Loading...</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={`teacher-dashboard fade-in ${activeTab ? 'sidebar-open' : ''}`}>
